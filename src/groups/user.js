@@ -38,19 +38,17 @@ const user_1 = __importDefault(require("../user"));
 const database_1 = __importDefault(require("../database"));
 // import { isMemberOfGroups } from './membership';
 // // import group_mem = require('./membership');
-const group_mem = __importStar(require("./membership"));
-const group_index = __importStar(require("./index"));
+// import * as group_mem from './membership';
+// import * as group_index from './index';
 const group_ownership = __importStar(require("./ownership"));
-module.exports = function (Groups_special) {
+module.exports = function (Groups) {
     function findUserGroups(uid, groupNames) {
         return __awaiter(this, void 0, void 0, function* () {
-            // The next line calls a function in a module that has not been updated to TS yet
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            const isMembers = yield group_mem.isMemberOfGroups(uid, groupNames);
+            const isMembers = yield Groups.isMemberOfGroups(uid, groupNames);
             return groupNames.filter((name, i) => isMembers[i]);
         });
     }
-    Groups_special.getUsersFromSet = function (set, fields) {
+    Groups.getUsersFromSet = function (set, fields) {
         return __awaiter(this, void 0, void 0, function* () {
             // The next line calls a function in a module that has not been updated to TS yet
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -65,18 +63,18 @@ module.exports = function (Groups_special) {
             return yield user_1.default.getUsersData(uids);
         });
     };
-    Groups_special.getUserGroups = function (uids) {
+    Groups.getUserGroups = function (uids) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield Groups_special.getUserGroupsFromSet('groups:visible:createtime', uids);
+            return yield Groups.getUserGroupsFromSet('groups:visible:createtime', uids);
         });
     };
-    Groups_special.getUserGroupsFromSet = function (set, uids) {
+    Groups.getUserGroupsFromSet = function (set, uids) {
         return __awaiter(this, void 0, void 0, function* () {
-            const memberOf = yield Groups_special.getUserGroupMembership(set, uids);
-            return yield Promise.all(memberOf.map(memberOf => Groups_special.getGroupsData(memberOf)));
+            const memberOf = yield Groups.getUserGroupMembership(set, uids);
+            return yield Promise.all(memberOf.map(memberOf => Groups.getGroupsData(memberOf)));
         });
     };
-    Groups_special.getUserGroupMembership = function (set, uids) {
+    Groups.getUserGroupMembership = function (set, uids) {
         return __awaiter(this, void 0, void 0, function* () {
             // The next line calls a function in a module that has not been updated to TS yet
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -84,12 +82,10 @@ module.exports = function (Groups_special) {
             return yield Promise.all(uids.map(uid => findUserGroups(uid, groupNames)));
         });
     };
-    Groups_special.getUserInviteGroups = function (uid) {
+    Groups.getUserInviteGroups = function (uid) {
         return __awaiter(this, void 0, void 0, function* () {
-            // The next line calls a function in a module that has not been updated to TS yet
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-            let allGroups = yield group_index.getNonPrivilegeGroups('groups:createtime', 0, -1);
-            allGroups = allGroups.filter(group => !Groups_special.ephemeralGroups.includes(group.name));
+            let allGroups = yield Groups.getNonPrivilegeGroups('groups:createtime', 0, -1);
+            allGroups = allGroups.filter(group => !Groups.ephemeralGroups.includes(group.name));
             const publicGroups = allGroups.filter(group => group.hidden === 0 && group.system === 0 && group.private === 0);
             const adminModGroups = [
                 { name: 'administrators', displayName: 'administrators' },
