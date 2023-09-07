@@ -1,12 +1,18 @@
 import user from '../user';
 import db from '../database';
+// import { isMemberOfGroups } from './membership';
+// // import group_mem = require('./membership');
 import * as group_mem from './membership';
+
 import * as group_index from './index';
 import * as group_ownership from './ownership';
 import { StatusObject } from '../types/status';
 import { GroupDataObject } from '../types/group';
 
 /* eslint-disable max-len */
+
+// The next line calls a function in a module that has not been updated to TS yet
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
 
 type UserClass = {
     uid?: number;
@@ -53,28 +59,28 @@ type UserClass = {
 
 type GroupClass = GroupDataObject & {
     getUsersFromSet?: (set: string, fields: Array<string>) => Promise<UserClass[]>;
-    getUserGroups?: (uids: Array<number>) => Promise<number[][]>;
-    getUserGroupsFromSet?: (set: string, uids:Array<number>) => Promise<number[][]>;
-    getUserGroupMembership?: (set:string, uids:number[]) => Promise<number[][]>;
-    getGroupsData?: (memberOf: Array<number>) => Promise<number[]>;
+    getUserGroups?: (uids: string[]) => Promise<string[][]>;
+    getUserGroupsFromSet?: (set: string, uids:string[]) => Promise<string[][]>;
+    getUserGroupMembership?: (set:string, uids:string[]) => Promise<string[][]>;
+    getGroupsData?: (memberOf: string[]) => Promise<string[]>;
     // isMemberOfGroups?: (uid:number, groupName:number[]) => Promise<number[]>;
-    getUserInviteGroups?: (uid:number) => Promise<GroupDataObject[]>;
+    getUserInviteGroups?: (uid:string) => Promise<GroupDataObject[]>;
     // getNonPrivilegeGroups?: (set:string, start:number, stop:number) => Promise<GroupDataObject[]>;
     ephemeralGroups?: string[];
 }
 
 export = function (Groups_special: GroupClass) {
-    async function findUserGroups(uid: number, groupNames: number[]): Promise<number[]> {
+    async function findUserGroups(uid: string, groupNames: string[]): Promise<string[]> {
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const isMembers:number[] = await group_mem.isMemberOfGroups(uid, groupNames) as number[];
+        const isMembers:string[] = await group_mem.isMemberOfGroups(uid, groupNames) as string[];
         return groupNames.filter((name, i) => isMembers[i]);
     }
 
     Groups_special.getUsersFromSet = async function (set:string, fields:Array<string>) {
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const uids:number[] = await db.getSetMembers(set) as number[];
+        const uids:string[] = await db.getSetMembers(set) as string[];
         if (fields) {
             // The next line calls a function in a module that has not been updated to TS yet
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
@@ -97,7 +103,7 @@ export = function (Groups_special: GroupClass) {
     Groups_special.getUserGroupMembership = async function (set, uids) {
         // The next line calls a function in a module that has not been updated to TS yet
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-        const groupNames:number[] = await db.getSortedSetRevRange(set, 0, -1) as number[];
+        const groupNames:string[] = await db.getSortedSetRevRange(set, 0, -1) as string[];
         return await Promise.all(uids.map(uid => findUserGroups(uid, groupNames)));
     };
 

@@ -36,6 +36,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 const user_1 = __importDefault(require("../user"));
 const database_1 = __importDefault(require("../database"));
+// import { isMemberOfGroups } from './membership';
+// // import group_mem = require('./membership');
 const group_mem = __importStar(require("./membership"));
 const group_index = __importStar(require("./index"));
 const group_ownership = __importStar(require("./ownership"));
